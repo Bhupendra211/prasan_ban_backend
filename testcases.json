@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "input": "5\n",
+    "expected_output": "Factorial: 120\n"
+  },
+  {
+    "id": 2,
+    "input": "3\n",
+    "expected_output": "Factorial: 6\n"
+  }
+]

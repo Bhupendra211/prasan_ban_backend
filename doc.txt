@@ -1,0 +1,6 @@
+
+
+Note: 
+1- The "number" is per question mark. 
+2- This we can calculate automatically when our admin is put the total mark on the create quiz section. 
+3- We need quiz id to add new question like: http:url.com/add-question/67cd4a6ec579843ef21645d9
