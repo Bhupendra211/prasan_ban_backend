@@ -8,22 +8,21 @@ import { validateFields } from "../utils/validateFields.js";
 export const registerManager = asyncHandler(async (req, res) => {
 
     try {
-        const requiredFields = ["name", "username", "dob", "password"];
+        const requiredFields = ["name", "username", "number", "password"];
         const errorMessage = validateFields(requiredFields, req.body);
         if (errorMessage) {
             return errorResponse(res, 400, errorMessage);
         }
 
-        const { name, username, dob, password } = req.body;
+        const { name, username, number, password } = req.body;
 
         const checkUsername = await User.findOne({ username: username });
-        console.log(checkUsername);
 
         if (checkUsername) {
-            return errorResponse(res, 400, 'Username Already Exists!');
+            return errorResponse(res, 400, 'Email Already Exists!');
         }
 
-        const manager = new User({ name, username, dob, password });
+        const manager = new User({ name, username, number, password });
         await manager.save();
 
         return successResponse(res, 201, "You are register successfully");

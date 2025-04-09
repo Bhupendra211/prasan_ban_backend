@@ -31,17 +31,23 @@ export const createQuiz = asyncHandler(async (req, res) => {
 
 // Get all quizzes
 export const getAllQuiz = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10 } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
 
     try {
-        const quizzes = await paginate(Quiz, {}, parseInt(page), parseInt(limit));
+        res.setHeader("Cache-Control", "no-store"); // Disable caching
+        console.log("Hello");
 
-        if (!quizzes.data.length) {
+        const quizzes = await paginate(Quiz, {}, page, limit);
+        console.log("quizzes", quizzes);
+
+        if (!quizzes || !quizzes.data || quizzes.data.length === 0) {
             return errorResponse(res, 404, "No quizzes found", null);
         }
 
         return successResponse(res, 200, "Quizzes fetched successfully", quizzes);
     } catch (error) {
+        console.error("Error in getAllQuiz:", error);
         return errorResponse(res, 500, "Internal Server Error", error.message);
     }
 });

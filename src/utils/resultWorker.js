@@ -14,30 +14,12 @@ const resultWorker = new Worker(
       await dbConnection();
       const { quiz_id } = job.data;
 
-      console.log("I am into the result worker for quiz:", quiz_id);
-
       // Fetch quiz details
       const quiz = await Quiz.findById(quiz_id);
       if (!quiz) {
         console.error(`Quiz not found for ID: ${quiz_id}`);
         throw new Error("Quiz not found!");
       }
-
-      const marks = quiz.per_question_marks || 0;
-      const negative = quiz.negative_marks || 0;
-
-      // Fetch all code attempts for this quiz
-      const codeAttempts = await CodeAttempt.find().lean();
-
-      // Group code attempts by student_id for quick lookup
-      const codeAttemptsByStudent = {};
-      codeAttempts.forEach((attempt) => {
-        const studentId = attempt.student_id.toString();
-        if (!codeAttemptsByStudent[studentId]) {
-          codeAttemptsByStudent[studentId] = [];
-        }
-        codeAttemptsByStudent[studentId].push(attempt);
-      });
 
       // Fetch all student attempts for the quiz
       const cursor = StudentAttempt.find({ quiz_id }).cursor();
@@ -59,28 +41,6 @@ const resultWorker = new Worker(
           total_attempts++;
         });
 
-        // Fetch all code attempts for this student
-        const studentCodeAttempts =
-          codeAttemptsByStudent[attempt.student_id.toString()] || [];
-
-        // Process code attempts for this student
-        for (const codeAttempt of studentCodeAttempts) {
-          // Fetch problem details (fixing incorrect `find` usage)
-          const problem = await Problem.findById(codeAttempt.problem_id);
-
-          // Ensure coding marks have valid values
-          const codingMarks = problem?.marks || 0;
-          const codingNegativeMarks = problem?.negative_marks || 0;
-
-          codeAttempt.answers.forEach((answer) => {
-            if (answer.answer_status === "right") {
-              score += codingMarks;
-            } else {
-              score -= codingNegativeMarks;
-            }
-          });
-        }
-
         // Ensure `score` is a valid number before database write
         score = isNaN(score) ? 0 : score;
 
@@ -100,8 +60,6 @@ const resultWorker = new Worker(
             upsert: true, // Insert if not exists, update if exists
           },
         });
-
-        console.log("bulkOperations:", bulkOperations);
 
         if (bulkOperations.length >= 100) {
           await Result.bulkWrite(bulkOperations);

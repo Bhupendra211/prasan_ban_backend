@@ -126,6 +126,8 @@ export const submitQuiz = asyncHandler(async (req, res) => {
 
     const { user_id, quiz_id } = req.body;
 
+    console.log(user_id, quiz_id, answers);
+
     await quizQueue.add("processQuizSubmission", {
       student_id: user_id,
       quiz_id,

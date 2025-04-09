@@ -5,6 +5,6 @@ const adminDashboard = express.Router();
 
 
 // Get all Quizzes
-adminDashboard.get('/all-quizzes', getDashboardData);
+adminDashboard.get('/all-data', getDashboardData);
 
 export default adminDashboard;

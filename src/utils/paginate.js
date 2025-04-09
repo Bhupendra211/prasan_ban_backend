@@ -3,6 +3,8 @@ export const paginate = async (model, query, page = 1, limit = 10) => {
 
     const results = await model.find(query).skip(skip).limit(limit);
 
+    console.log("Result is: ",results)
+
     const total = await model.countDocuments(query);
     return {
         total,

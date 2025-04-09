@@ -13,8 +13,8 @@ const userSchema = new Schema({
         unique: true,
         trim: true,
     },
-    dob: {
-        type: Date,
+    number: {
+        type: Number,
         required: true,
         unique: true,
         trim: true,
